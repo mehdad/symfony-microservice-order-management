@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Enqueue\RdKafka\RdKafkaContext;
+use http\Client\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,5 +27,14 @@ class WarehouseController extends AbstractController
         $content = $response->getContent();
 
         return $this->json(json_decode($content));
+    }
+
+    #[Route('/kafka-test', name: 'app_warehouse')]
+    public function sendMessage(RdKafkaContext $context): Response
+    {
+        $message = $context->createMessage('Hello, Kafka!');
+        $context->createProducer()->send('test', $message);
+
+        return new Response('Message sent to Kafka!');
     }
 }
